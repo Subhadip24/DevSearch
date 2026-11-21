@@ -1,10 +1,25 @@
 # 🌊 DevSearch - Personal Google & GitHub Project Hub
 
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Website-GitHub_Pages-2ea44f?style=for-the-badge)](https://subhadip24.github.io/DevSearch/)
 [![GitHub](https://img.shields.io/badge/GitHub-Subhadip24-181717?style=flat&logo=github)](https://github.com/Subhadip24)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python)](https://www.python.org/)
 
+> 🚀 **Live Hosted Link:** **[https://subhadip24.github.io/DevSearch/](https://subhadip24.github.io/DevSearch/)**
+
 **DevSearch** is a personalized, Google-style developer portal and project hub. It lets you explore, manage, search, and upload all your code projects seamlessly, combined with real-time GitHub synchronization and a 60 FPS animated sea-storm background.
+
+---
+
+## 🌐 Live Website
+
+Experience DevSearch directly on GitHub Pages with zero setup:
+👉 **[https://subhadip24.github.io/DevSearch/](https://subhadip24.github.io/DevSearch/)**
+
+* ⚡ **100% Serverless**: Runs completely in the browser via GitHub REST API.
+* 🌓 **Dark & Light Mode**: Seamless atmospheric transitions.
+* 🌪️ **60 FPS Physics Engine**: Interactive tornado vortex & moving ship animation.
+* 💻 **Direct Code Exploration**: Read files, explore trees, and launch Web VS Code in 1 click!
 
 ---
 
@@ -41,7 +56,7 @@
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Running Locally
 
 ### Prerequisites
 * Python 3.10 or higher
@@ -69,47 +84,45 @@
    ```env
    GITHUB_TOKEN=ghp_your_token_here
    ```
-   *(Or simply connect your token directly via the web interface after launching).*
+   *(Or connect your token directly via the web interface after launching).*
 
 4. **Run the application:**
    ```bash
    python run.py
    ```
-   *(On Windows, you can also double-click `start.bat`)*
+   *(On Windows, simply double-click `start.bat`)*
 
 5. Open your browser:
    👉 **`http://127.0.0.1:8000`**
 
 ---
 
-## ☁️ Cloud Hosting
+## ☁️ Cloud & Platform Hosting
 
-DevSearch can be deployed to any cloud platform in minutes:
+### 1. GitHub Pages (Static / Serverless)
+DevSearch includes full client-side hybrid capability:
+* Repository root includes `index.html` configured for GitHub Pages.
+* Enable Pages in **Settings** → **Pages** → Source: **Deploy from a branch (`main` or `gh-pages`)**.
+* Live at: `https://subhadip24.github.io/DevSearch/`
 
-### Deploy to Render
+### 2. Full-Stack on Render.com
 1. Create a new **Web Service** on [Render.com](https://render.com).
-2. Connect this repository (`Subhadip24/DevSearch`).
+2. Connect `Subhadip24/DevSearch`.
 3. Set the **Start Command**:
    ```bash
    uvicorn app:app --host 0.0.0.0 --port $PORT
    ```
-4. Add the environment variable:
-   * `GITHUB_TOKEN`: Your GitHub Personal Access Token.
-
-### Deploy to Railway / Heroku
-Using the included `Procfile`:
-```
-web: uvicorn app:app --host 0.0.0.0 --port $PORT
-```
+4. Set the environment variable `GITHUB_TOKEN`.
 
 ---
 
 ## 🛠️ Tech Stack
 
+* **Frontend**: HTML5, CSS3 Glassmorphism, Vanilla JavaScript ES6+
 * **Backend**: FastAPI, Uvicorn, Requests, Python-Multipart, Jinja2
-* **Frontend**: HTML5, CSS3 Glassmorphism, Vanilla JavaScript
 * **Graphics**: HTML5 2D Canvas Physics Engine (60 FPS Tornado & Ship simulation)
-* **Integration**: GitHub REST API v3
+* **API**: GitHub REST API v3
+* **Hosting**: GitHub Pages
 
 ---
 
