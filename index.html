@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSearch - Personal Google & GitHub Project Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Product+Sans:wght@400;700&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <!-- Animated Storm & Ship Canvas Background -->
+    <canvas id="stormCanvas" class="storm-background-canvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="#" class="header-brand">
+                <span class="logo-text">
+                    <span class="g-blue">D</span><span class="g-red">e</span><span class="g-yellow">v</span><span class="g-blue">S</span><span class="g-green">e</span><span class="g-red">a</span><span class="g-blue">r</span><span class="g-green">c</span><span class="g-yellow">h</span>
+                </span>
+            </a>
+        </div>
+        <div class="header-right">
+            <!-- Real-time GitHub Auto-Sync Pill -->
+            <div class="live-sync-indicator" id="liveSyncIndicator" title="Automatically syncing with your GitHub in real time">
+                <span class="sync-dot"></span>
+                <span id="syncText">Live Sync</span>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button id="themeToggleBtn" class="icon-btn" title="Toggle Dark/Light Mode">
+                <span id="themeIcon">🌙</span>
+            </button>
+
+            <!-- Upload Project Button -->
+            <button id="openUploadBtn" class="btn btn-primary" title="Upload new project to GitHub">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                <span>Upload Project</span>
+            </button>
+
+            <!-- GitHub Account / Settings -->
+            <button id="openSettingsBtn" class="btn btn-outline" title="Connect GitHub Account">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                <span id="githubStatusLabel">Connect GitHub</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        
+        <!-- Google-Style Center Section -->
+        <section class="search-section" id="searchSection">
+            <div class="google-logo-wrapper">
+                <h1 class="google-brand">
+                    <span class="g-blue">D</span><span class="g-red">e</span><span class="g-yellow">v</span><span class="g-blue">S</span><span class="g-green">e</span><span class="g-red">a</span><span class="g-blue">r</span><span class="g-green">c</span><span class="g-yellow">h</span>
+                </h1>
+                <p class="tagline">Search all your GitHub repositories, code & the web in one place</p>
+            </div>
+
+            <!-- Search Mode Tabs -->
+            <div class="search-modes" id="searchModes">
+                <button class="mode-tab active" data-mode="github">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    My GitHub Projects
+                </button>
+                <button class="mode-tab" data-mode="web">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    Google Web Search
+                </button>
+                <button class="mode-tab" data-mode="gh_all">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    GitHub Global Search
+                </button>
+            </div>
+
+            <!-- Google-Style Search Box -->
+            <div class="search-box-container">
+                <div class="search-box">
+                    <div class="search-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search your repositories, languages, or projects..." autocomplete="off" autofocus>
+                    <button id="clearSearchBtn" class="clear-btn" style="display: none;" title="Clear search">✕</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="search-actions">
+                <button id="searchBtn" class="btn btn-secondary">Search</button>
+                <button id="luckyBtn" class="btn btn-secondary">I'm Feeling Lucky</button>
+            </div>
+
+            <!-- GitHub Connect Notice (if not configured) -->
+            <div id="unconfiguredBanner" class="banner-notice" style="display: none;">
+                <div class="banner-icon">⚡</div>
+                <div class="banner-text">
+                    <strong>Connect your GitHub account</strong> to see all your repositories, search across projects, and upload new code in one click!
+                </div>
+                <button class="btn btn-sm btn-primary" onclick="openSettingsModal()">Connect GitHub Now</button>
+            </div>
+        </section>
+
+        <!-- Stats and Filter Bar -->
+        <section class="filters-section" id="filtersSection" style="display: none;">
+            <div class="stats-bar">
+                <span class="stat-item" id="repoCountStat"><strong>0</strong> Repositories</span>
+                <span class="stat-divider">•</span>
+                <span class="stat-item" id="starsCountStat">⭐ <strong>0</strong> Stars</span>
+                <span class="stat-divider">•</span>
+                <span class="stat-item" id="forksCountStat">🍴 <strong>0</strong> Forks</span>
+                <button id="refreshReposBtn" class="icon-btn-sm" title="Refresh repositories from GitHub">🔄 Refresh</button>
+            </div>
+
+            <div class="filter-controls">
+                <!-- Language Filters -->
+                <div class="filter-chips" id="languageChips">
+                    <button class="chip active" data-filter-type="lang" data-filter="all">All</button>
+                </div>
+
+                <!-- Visibility / Sorting Filter -->
+                <div class="filter-dropdowns">
+                    <select id="visibilityFilter" class="select-input">
+                        <option value="all">All Visibility</option>
+                        <option value="public">Public Only</option>
+                        <option value="private">Private Only</option>
+                    </select>
+
+                    <select id="sortBy" class="select-input">
+                        <option value="updated">Recently Updated</option>
+                        <option value="stars">Most Stars</option>
+                        <option value="name">Alphabetical</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Repository Results Grid -->
+        <section class="results-section">
+            <div id="loadingIndicator" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading your repositories from GitHub...</p>
+            </div>
+
+            <div id="emptyResults" class="empty-state" style="display: none;">
+                <div class="empty-icon">📂</div>
+                <h3>No repositories found</h3>
+                <p>Try searching for a different keyword or upload a new project!</p>
+            </div>
+
+            <div class="repo-grid" id="repoGrid">
+                <!-- Dynamically rendered repository cards -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Connect / Settings GitHub Token -->
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>GitHub Connection Settings</h3>
+                <button class="modal-close" onclick="closeSettingsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="current-user-box" id="currentUserBox" style="display: none;">
+                    <img id="userAvatar" src="" alt="Avatar" class="user-avatar">
+                    <div class="user-info">
+                        <h4 id="userName">User Name</h4>
+                        <p id="userLogin">@username</p>
+                        <span class="badge badge-success">Connected</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="githubTokenInput">GitHub Personal Access Token (Classic or Fine-grained)</label>
+                    <div class="token-input-wrapper">
+                        <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="text-input">
+                        <button type="button" class="btn-toggle-visibility" onclick="toggleTokenVisibility()">👁️</button>
+                    </div>
+                    <small class="helper-text">
+                        Your token is stored locally on your machine and never shared. Requires <code>repo</code> permissions so you can view private repos and upload new projects.
+                    </small>
+                </div>
+
+                <div class="token-guide-box">
+                    <strong>How to get your free GitHub token:</strong>
+                    <ol>
+                        <li>Visit <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">GitHub Token Settings</a>.</li>
+                        <li>Click <strong>Generate new token (classic)</strong>.</li>
+                        <li>Set Note to <code>DevSearch Hub</code>, select the <code>repo</code> checkbox, and click <strong>Generate token</strong>.</li>
+                        <li>Copy the token and paste it above!</li>
+                    </ol>
+                </div>
+
+                <div id="settingsError" class="alert-error" style="display: none;"></div>
+                <div id="settingsSuccess" class="alert-success" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+                <button id="saveTokenBtn" class="btn btn-primary">Save & Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Upload New Project -->
+    <div id="uploadModal" class="modal-overlay">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>Upload Project to GitHub</h3>
+                <button class="modal-close" onclick="closeUploadModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="form-row">
+                        <div class="form-group flex-2">
+                            <label for="projectNameInput">Project / Repository Name <span class="required">*</span></label>
+                            <input type="text" id="projectNameInput" name="name" placeholder="my-awesome-app" required class="text-input">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="projectVisibility">Visibility</label>
+                            <select id="projectVisibility" name="is_private" class="select-input">
+                                <option value="false">Public</option>
+                                <option value="true">Private</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectDescInput">Description (Optional)</label>
+                        <input type="text" id="projectDescInput" name="description" placeholder="A short description of what this project does..." class="text-input">
+                    </div>
+
+                    <!-- Drag & Drop Upload Zone -->
+                    <div class="form-group">
+                        <label>Select Project Files</label>
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-zone-icon">📁</div>
+                            <p class="drop-zone-title">Drag & drop your project <strong>.zip file</strong> or folder here</p>
+                            <p class="drop-zone-sub">or click to browse from your computer</p>
+                            <input type="file" id="fileInput" name="archive" accept=".zip" class="file-input-hidden">
+                            <div id="selectedFileInfo" class="selected-file-info" style="display: none;">
+                                📄 <span id="selectedFileName">project.zip</span>
+                                <button type="button" class="btn-remove-file" onclick="removeSelectedFile()">✕</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row checkboxes">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="addReadmeCheck" name="add_readme" checked>
+                            <span>Auto-generate <code>README.md</code> if missing</span>
+                        </label>
+                    </div>
+
+                    <div id="uploadProgressBox" class="progress-box" style="display: none;">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progressBar"></div>
+                        </div>
+                        <p id="uploadStatusText" class="progress-status">Uploading files and creating GitHub repository...</p>
+                    </div>
+
+                    <div id="uploadError" class="alert-error" style="display: none;"></div>
+                    <div id="uploadSuccess" class="alert-success" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button id="submitUploadBtn" class="btn btn-primary" onclick="submitProjectUpload()">Upload & Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: README Viewer -->
+    <div id="readmeModal" class="modal-overlay">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <div class="readme-title-group">
+                    <span class="badge badge-outline">README</span>
+                    <h3 id="readmeRepoTitle">Repository Name</h3>
+                </div>
+                <div class="modal-header-actions">
+                    <a id="readmeExternalLink" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline">View on GitHub ↗</a>
+                    <button class="modal-close" onclick="closeReadmeModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body markdown-body" id="readmeContent">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: In-Browser Direct Code & Project Explorer -->
+    <div id="codeExplorerModal" class="modal-overlay">
+        <div class="modal-content modal-explorer">
+            <div class="modal-header">
+                <div class="explorer-title-group">
+                    <span class="badge badge-primary">⚡ Project Explorer</span>
+                    <h3 id="explorerRepoTitle">Repository Name</h3>
+                    <span class="badge badge-outline" id="explorerBranchTag">main</span>
+                </div>
+                <div class="modal-header-actions">
+                    <a id="explorerWebIdeBtn" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-primary" title="Open VS Code in your browser (no install needed)">
+                        🌐 Open in Web VS Code
+                    </a>
+                    <a id="explorerDownloadZipBtn" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-secondary" title="Download ZIP">
+                        ⬇️ ZIP
+                    </a>
+                    <button class="modal-close" onclick="closeCodeExplorerModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body explorer-body">
+                <!-- Left Pane: File & Folder Navigation Tree -->
+                <div class="explorer-sidebar">
+                    <div class="explorer-breadcrumbs" id="explorerBreadcrumbs">
+                        <span class="breadcrumb-item" onclick="navigateExplorerPath('')">root</span>
+                    </div>
+                    <div class="explorer-tree-container" id="explorerTree">
+                        <div class="spinner-sm"></div>
+                    </div>
+                </div>
+
+                <!-- Right Pane: Direct Code / File Viewer -->
+                <div class="explorer-content">
+                    <div class="file-viewer-header" id="fileViewerHeader">
+                        <div class="file-viewer-meta">
+                            <span id="activeFileName" class="active-file-name">Select a file to inspect</span>
+                            <span id="activeFileSize" class="active-file-size"></span>
+                        </div>
+                        <div class="file-viewer-actions" id="fileViewerActions" style="display: none;">
+                            <button id="copyFileBtn" class="btn btn-sm btn-outline" onclick="copyCurrentFileContent()">📋 Copy File</button>
+                            <a id="rawFileBtn" href="#" target="_blank" class="btn btn-sm btn-outline">Raw</a>
+                        </div>
+                    </div>
+                    <div class="code-viewer-container" id="codeViewerContainer">
+                        <div class="empty-code-placeholder">
+                            <div style="font-size: 32px; margin-bottom: 8px;">💻</div>
+                            <p>Select any code or documentation file on the left to preview it directly in your browser.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification for Copied Clone URL -->
+    <div id="toast" class="toast">Command copied to clipboard!</div>
+
+    <script src="static/js/tornado-ship.js"></script>
+    <script src="static/js/main.js"></script>
+</body>
+</html>
+

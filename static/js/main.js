@@ -22,6 +22,19 @@ const LANGUAGE_COLORS = {
     "Shell": "#89e051"
 };
 
+// Static Hosting (GitHub Pages) vs Local Backend Detection
+const IS_STATIC_HOSTING = window.location.protocol === 'file:' || 
+                          window.location.hostname.includes('github.io') || 
+                          (window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost');
+const DEFAULT_GITHUB_USER = 'Subhadip24';
+
+function getGitHubHeaders() {
+    const token = localStorage.getItem("devsearch_token") || "";
+    const headers = { "Accept": "application/vnd.github.v3+json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return headers;
+}
+
 // Global App State
 let appState = {
     repositories: [],
@@ -152,6 +165,31 @@ function updateSearchPlaceholder() {
 // Auth & Repositories Fetching
 // --------------------------------------------------------------------------
 async function checkAuthStatus() {
+    if (IS_STATIC_HOSTING) {
+        // Direct Client-Side mode for GitHub Pages
+        const token = localStorage.getItem("devsearch_token");
+        try {
+            const url = token ? "https://api.github.com/user" : `https://api.github.com/users/${DEFAULT_GITHUB_USER}`;
+            const res = await fetch(url, { headers: getGitHubHeaders() });
+            if (res.ok) {
+                const user = await res.json();
+                appState.isConfigured = true;
+                appState.user = user;
+                githubStatusLabel.textContent = `@${user.login}`;
+                unconfiguredBanner.style.display = "none";
+                loadRepositories();
+                return;
+            }
+        } catch (e) {
+            console.warn("Client-side user fetch failed:", e);
+        }
+        appState.isConfigured = false;
+        githubStatusLabel.textContent = "Connect GitHub";
+        unconfiguredBanner.style.display = "flex";
+        filtersSection.style.display = "none";
+        return;
+    }
+
     try {
         const res = await fetch("/api/status");
         const data = await res.json();
@@ -177,6 +215,72 @@ async function loadRepositories(refresh = false) {
     loadingIndicator.style.display = "block";
     emptyResults.style.display = "none";
     repoGrid.innerHTML = "";
+
+    if (IS_STATIC_HOSTING) {
+        try {
+            const token = localStorage.getItem("devsearch_token");
+            const url = token 
+                ? "https://api.github.com/user/repos?per_page=100&sort=updated&affiliation=owner,collaborator"
+                : `https://api.github.com/users/${DEFAULT_GITHUB_USER}/repos?per_page=100&sort=updated`;
+            
+            const res = await fetch(url, { headers: getGitHubHeaders() });
+            if (!res.ok) throw new Error("Could not fetch repositories from GitHub");
+            const rawRepos = await res.json();
+
+            const repos = rawRepos.map(r => ({
+                id: r.id,
+                name: r.name,
+                full_name: r.full_name,
+                owner: r.owner ? r.owner.login : DEFAULT_GITHUB_USER,
+                owner_avatar: r.owner ? r.owner.avatar_url : "",
+                html_url: r.html_url,
+                description: r.description || "No description provided.",
+                language: r.language || "Code",
+                stars: r.stargazers_count || 0,
+                forks: r.forks_count || 0,
+                is_private: r.private || false,
+                is_fork: r.fork || false,
+                updated_at: r.updated_at,
+                default_branch: r.default_branch || "main",
+                clone_url: r.clone_url,
+                open_issues: r.open_issues_count || 0,
+                topics: r.topics || []
+            }));
+
+            appState.repositories = repos;
+
+            const languages = {};
+            let totalStars = 0, totalForks = 0;
+            repos.forEach(r => {
+                if (r.language && r.language !== "Code") {
+                    languages[r.language] = (languages[r.language] || 0) + 1;
+                }
+                totalStars += r.stars;
+                totalForks += r.forks;
+            });
+            const sortedLangs = Object.keys(languages).sort((a,b) => languages[b] - languages[a]);
+
+            repoCountStat.innerHTML = `<strong>${repos.length}</strong> Repositories`;
+            starsCountStat.innerHTML = `⭐ <strong>${totalStars}</strong> Stars`;
+            forksCountStat.innerHTML = `🍴 <strong>${totalForks}</strong> Forks`;
+
+            renderLanguageChips(sortedLangs.slice(0, 10), languages);
+            filtersSection.style.display = "block";
+            filterAndRenderRepos();
+            startAutoSync();
+        } catch (err) {
+            console.error("Error loading repos in static mode:", err);
+            repoGrid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <p class="text-danger">Failed to load repositories: ${err.message}</p>
+                    <button class="btn btn-primary" onclick="openSettingsModal()">Check GitHub Token</button>
+                </div>
+            `;
+        } finally {
+            loadingIndicator.style.display = "none";
+        }
+        return;
+    }
 
     try {
         const url = `/api/repos?refresh=${refresh}`;
@@ -390,9 +494,24 @@ async function viewReadme(owner, repo) {
     modal.classList.add("active");
 
     try {
-        const res = await fetch(`/api/repo/${owner}/${repo}/readme`);
-        const data = await res.json();
-        content.innerHTML = data.html || "<p class='text-muted'>No README content found.</p>";
+        let htmlContent = "";
+        if (IS_STATIC_HOSTING) {
+            const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/readme`, {
+                headers: { "Accept": "application/vnd.github.html+json", ...getGitHubHeaders() }
+            });
+            if (res.status === 404) {
+                htmlContent = "<p class='text-muted'>No README.md found in this repository.</p>";
+            } else if (!res.ok) {
+                throw new Error("Could not load README");
+            } else {
+                htmlContent = await res.text();
+            }
+        } else {
+            const res = await fetch(`/api/repo/${owner}/${repo}/readme`);
+            const data = await res.json();
+            htmlContent = data.html || "<p class='text-muted'>No README content found.</p>";
+        }
+        content.innerHTML = htmlContent;
     } catch (err) {
         content.innerHTML = `<p class="text-danger">Failed to load README: ${err.message}</p>`;
     }
@@ -602,6 +721,17 @@ async function saveGitHubToken() {
         return;
     }
 
+    if (IS_STATIC_HOSTING) {
+        localStorage.setItem("devsearch_token", token);
+        successDiv.textContent = "Token connected and saved in your browser!";
+        successDiv.style.display = "block";
+        tokenInput.value = "";
+        await checkAuthStatus();
+        showToast("Connected to GitHub!");
+        setTimeout(() => closeSettingsModal(), 1200);
+        return;
+    }
+
     saveBtn.disabled = true;
     saveBtn.textContent = "Verifying...";
 
@@ -685,8 +815,34 @@ async function loadExplorerPath(path) {
     tree.innerHTML = '<div class="spinner-sm"></div>';
 
     try {
-        const res = await fetch(`/api/repo/${explorerState.owner}/${explorerState.repo}/contents?path=${encodeURIComponent(path)}`);
-        const data = await res.json();
+        let data = null;
+        if (IS_STATIC_HOSTING) {
+            const cleanPath = path.replace(/^\/+|\/+$/g, '');
+            const url = cleanPath 
+                ? `https://api.github.com/repos/${explorerState.owner}/${explorerState.repo}/contents/${cleanPath}`
+                : `https://api.github.com/repos/${explorerState.owner}/${explorerState.repo}/contents`;
+            const res = await fetch(url, { headers: getGitHubHeaders() });
+            if (res.status === 404) {
+                data = { empty: true, items: [] };
+            } else if (!res.ok) {
+                throw new Error("Could not load repository contents");
+            } else {
+                const rawItems = await res.json();
+                const list = Array.isArray(rawItems) ? rawItems : [rawItems];
+                const items = list.map(item => ({
+                    name: item.name,
+                    path: item.path,
+                    type: item.type,
+                    size: item.size || 0,
+                    download_url: item.download_url
+                }));
+                items.sort((a,b) => (a.type === 'dir' ? 0 : 1) - (b.type === 'dir' ? 0 : 1) || a.name.localeCompare(b.name));
+                data = { empty: items.length === 0, items: items };
+            }
+        } else {
+            const res = await fetch(`/api/repo/${explorerState.owner}/${explorerState.repo}/contents?path=${encodeURIComponent(path)}`);
+            data = await res.json();
+        }
 
         if (data.empty) {
             tree.innerHTML = `
@@ -752,14 +908,34 @@ async function viewFile(path, name, size, downloadUrl) {
     container.innerHTML = '<div class="spinner-sm"></div><p style="text-align: center; color: var(--text-muted); font-size: 13px;">Loading file...</p>';
 
     try {
-        const res = await fetch(`/api/repo/${explorerState.owner}/${explorerState.repo}/file?path=${encodeURIComponent(path)}`);
-        const data = await res.json();
+        let fileText = "";
+        if (IS_STATIC_HOSTING) {
+            const cleanPath = path.replace(/^\/+|\/+$/g, '');
+            const res = await fetch(`https://api.github.com/repos/${explorerState.owner}/${explorerState.repo}/contents/${cleanPath}`, {
+                headers: getGitHubHeaders()
+            });
+            if (!res.ok) throw new Error("Could not load file content");
+            const fileData = await res.json();
+            if (fileData.encoding === "base64" && fileData.content) {
+                try {
+                    fileText = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
+                } catch(e) {
+                    fileText = atob(fileData.content.replace(/\s/g, ''));
+                }
+            } else {
+                fileText = fileData.content || "Empty file.";
+            }
+        } else {
+            const res = await fetch(`/api/repo/${explorerState.owner}/${explorerState.repo}/file?path=${encodeURIComponent(path)}`);
+            const data = await res.json();
+            fileText = data.content;
+        }
 
-        explorerState.activeFileContent = data.content;
+        explorerState.activeFileContent = fileText;
 
         // Render code
         container.innerHTML = `
-            <pre class="code-pre"><code id="codeViewerText">${escapeHTML(data.content)}</code></pre>
+            <pre class="code-pre"><code id="codeViewerText">${escapeHTML(fileText)}</code></pre>
         `;
     } catch (err) {
         container.innerHTML = `<p class="text-danger" style="padding: 20px;">Failed to load file: ${err.message}</p>`;
@@ -855,35 +1031,75 @@ async function checkForNewRepos(force = false) {
     if (syncText) syncText.textContent = "Syncing...";
 
     try {
-        const knownIds = appState.repositories.map(r => r.id);
-        const res = await fetch("/api/repos/sync", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ known_ids: knownIds })
-        });
+        let newRepos = [];
+        let totalCount = 0;
 
-        if (res.ok) {
-            const data = await res.json();
-            if (data.has_new && data.new_repos && data.new_repos.length > 0) {
-                // New repos found on GitHub!
-                data.new_repos.forEach(newRepo => {
-                    showToast(`✨ New GitHub Project Detected: "${newRepo.name}" added to your browser!`);
-                    // Prepend to repositories list so it appears at top
-                    appState.repositories.unshift(newRepo);
-                });
-
-                // Update stats and re-render
-                repoCountStat.innerHTML = `<strong>${data.total_count}</strong> Repositories`;
-                filterAndRenderRepos();
-
-                // Highlight newly added repo cards with a glowing pulse
-                setTimeout(() => {
-                    const firstCards = repoGrid.querySelectorAll(".repo-card");
-                    for (let i = 0; i < Math.min(data.new_repos.length, firstCards.length); i++) {
-                        firstCards[i].classList.add("new-repo-pulse");
-                    }
-                }, 100);
+        if (IS_STATIC_HOSTING) {
+            const token = localStorage.getItem("devsearch_token");
+            const url = token 
+                ? "https://api.github.com/user/repos?per_page=100&sort=updated" 
+                : `https://api.github.com/users/${DEFAULT_GITHUB_USER}/repos?per_page=100&sort=updated`;
+            const res = await fetch(url, { headers: getGitHubHeaders() });
+            if (res.ok) {
+                const latest = await res.json();
+                const knownIds = new Set(appState.repositories.map(r => r.id));
+                newRepos = latest.filter(r => !knownIds.has(r.id)).map(r => ({
+                    id: r.id,
+                    name: r.name,
+                    full_name: r.full_name,
+                    owner: r.owner ? r.owner.login : DEFAULT_GITHUB_USER,
+                    owner_avatar: r.owner ? r.owner.avatar_url : "",
+                    html_url: r.html_url,
+                    description: r.description || "No description provided.",
+                    language: r.language || "Code",
+                    stars: r.stargazers_count || 0,
+                    forks: r.forks_count || 0,
+                    is_private: r.private || false,
+                    is_fork: r.fork || false,
+                    updated_at: r.updated_at,
+                    default_branch: r.default_branch || "main",
+                    clone_url: r.clone_url,
+                    open_issues: r.open_issues_count || 0,
+                    topics: r.topics || []
+                }));
+                totalCount = latest.length;
             }
+        } else {
+            const knownIds = appState.repositories.map(r => r.id);
+            const res = await fetch("/api/repos/sync", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ known_ids: knownIds })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.has_new && data.new_repos && data.new_repos.length > 0) {
+                    newRepos = data.new_repos;
+                    totalCount = data.total_count;
+                }
+            }
+        }
+
+        if (newRepos.length > 0) {
+            // New repos found on GitHub!
+            newRepos.forEach(newRepo => {
+                showToast(`✨ New GitHub Project Detected: "${newRepo.name}" added to your browser!`);
+                // Prepend to repositories list so it appears at top
+                appState.repositories.unshift(newRepo);
+            });
+
+            // Update stats and re-render
+            repoCountStat.innerHTML = `<strong>${totalCount || appState.repositories.length}</strong> Repositories`;
+            filterAndRenderRepos();
+
+            // Highlight newly added repo cards with a glowing pulse
+            setTimeout(() => {
+                const firstCards = repoGrid.querySelectorAll(".repo-card");
+                for (let i = 0; i < Math.min(newRepos.length, firstCards.length); i++) {
+                    firstCards[i].classList.add("new-repo-pulse");
+                }
+            }, 100);
         }
     } catch (err) {
         console.warn("Auto-sync check error:", err);
