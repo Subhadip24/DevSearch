@@ -87,6 +87,7 @@ function initTheme() {
         document.documentElement.setAttribute("data-theme", nextTheme);
         localStorage.setItem("devsearch_theme", nextTheme);
         updateThemeIcon(nextTheme);
+        updateStatsTheme();
     });
 }
 
@@ -146,14 +147,18 @@ function initEventListeners() {
     document.getElementById("openSettingsBtn").addEventListener("click", openSettingsModal);
     document.getElementById("openUploadBtn").addEventListener("click", openUploadModal);
     document.getElementById("saveTokenBtn").addEventListener("click", saveGitHubToken);
+    const openStatsBtn = document.getElementById("openStatsBtn");
+    if (openStatsBtn) openStatsBtn.addEventListener("click", openStatsModal);
 
     // File Drag and Drop in Upload Modal
     setupDropZone();
 }
 
 function updateSearchPlaceholder() {
-    if (appState.searchMode === "web") {
-        searchInput.placeholder = "Search Google or type a URL...";
+    if (appState.searchMode === "private_web") {
+        searchInput.placeholder = "Search web privately (zero history saved to Google)...";
+    } else if (appState.searchMode === "web") {
+        searchInput.placeholder = "Search Google with history personalization disabled...";
     } else if (appState.searchMode === "gh_all") {
         searchInput.placeholder = "Search all GitHub repositories, code, and users...";
     } else {
@@ -362,13 +367,21 @@ function handleSearchInput() {
 function executeSearch() {
     const query = searchInput.value.trim();
 
-    if (appState.searchMode === "web") {
+    if (appState.searchMode === "private_web") {
         if (query) {
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank");
+            // DuckDuckGo: Zero tracking, zero Google account history stored
+            window.open(`https://duckduckgo.com/?q=${encodeURIComponent(query)}`, "_blank", "noopener,noreferrer");
+            showToast("🔒 Searched privately (No history stored)");
+        }
+    } else if (appState.searchMode === "web") {
+        if (query) {
+            // pws=0 disables personalized Google search history
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}&pws=0`, "_blank", "noopener,noreferrer");
+            showToast("🔍 Google Search (Personalized history tracking disabled)");
         }
     } else if (appState.searchMode === "gh_all") {
         if (query) {
-            window.open(`https://github.com/search?q=${encodeURIComponent(query)}`, "_blank");
+            window.open(`https://github.com/search?q=${encodeURIComponent(query)}`, "_blank", "noopener,noreferrer");
         }
     } else {
         filterAndRenderRepos();
@@ -376,9 +389,13 @@ function executeSearch() {
 }
 
 function handleLuckySearch() {
+    const query = searchInput.value.trim();
+    if (appState.searchMode === "private_web") {
+        window.open(`https://duckduckgo.com/?q=!+${encodeURIComponent(query || "Tech")}`, "_blank", "noopener,noreferrer");
+        return;
+    }
     if (appState.searchMode === "web") {
-        const query = searchInput.value.trim() || "Google";
-        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}&btnI=1`, "_blank");
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(query || "Google")}&btnI=1&pws=0`, "_blank", "noopener,noreferrer");
         return;
     }
 
@@ -1107,6 +1124,115 @@ async function checkForNewRepos(force = false) {
         isSyncing = false;
         if (syncText) syncText.textContent = "Live Sync";
     }
+}
+
+// --------------------------------------------------------------------------
+// Subhadip's CV & Resume Modal Handlers
+// --------------------------------------------------------------------------
+function openCvModal() {
+    const savedPdf = localStorage.getItem("devsearch_custom_cv_pdf");
+    const customContainer = document.getElementById("customPdfContainer");
+    const nativeContainer = document.getElementById("nativeCvDocument");
+    const customFrame = document.getElementById("customPdfFrame");
+
+    if (savedPdf && customContainer && nativeContainer && customFrame) {
+        customFrame.src = savedPdf;
+        customContainer.style.display = "block";
+        nativeContainer.style.display = "none";
+    } else if (customContainer && nativeContainer) {
+        customContainer.style.display = "none";
+        nativeContainer.style.display = "block";
+    }
+
+    const modal = document.getElementById("cvModal");
+    if (modal) modal.classList.add("active");
+}
+
+function closeCvModal() {
+    const modal = document.getElementById("cvModal");
+    if (modal) modal.classList.remove("active");
+}
+
+function handleCvPdfUpload(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const dataUrl = e.target.result;
+            try {
+                localStorage.setItem("devsearch_custom_cv_pdf", dataUrl);
+            } catch (err) {
+                console.warn("Storage quota warning for custom PDF:", err);
+            }
+            const customContainer = document.getElementById("customPdfContainer");
+            const nativeContainer = document.getElementById("nativeCvDocument");
+            const customFrame = document.getElementById("customPdfFrame");
+
+            if (customFrame && customContainer && nativeContainer) {
+                customFrame.src = dataUrl;
+                customContainer.style.display = "block";
+                nativeContainer.style.display = "none";
+            }
+            showToast("Custom PDF uploaded! Displaying inside CV viewer.");
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function resetToNativeCv() {
+    localStorage.removeItem("devsearch_custom_cv_pdf");
+    const customContainer = document.getElementById("customPdfContainer");
+    const nativeContainer = document.getElementById("nativeCvDocument");
+    if (customContainer) customContainer.style.display = "none";
+    if (nativeContainer) nativeContainer.style.display = "block";
+    showToast("Switched back to standard CV view.");
+}
+
+// --------------------------------------------------------------------------
+// GitHub Stats & Analytics Modal Handlers
+// --------------------------------------------------------------------------
+function openStatsModal() {
+    updateStatsTheme();
+
+    const totalRepos = appState.repositories.length;
+    let totalStars = 0, totalForks = 0;
+    const langs = new Set();
+    appState.repositories.forEach(r => {
+        totalStars += (r.stars || 0);
+        totalForks += (r.forks || 0);
+        if (r.language && r.language !== "Code") langs.add(r.language);
+    });
+
+    const reposEl = document.getElementById("statsModalRepos");
+    const starsEl = document.getElementById("statsModalStars");
+    const forksEl = document.getElementById("statsModalForks");
+    const langsEl = document.getElementById("statsModalLangs");
+
+    if (reposEl) reposEl.textContent = totalRepos || "20";
+    if (starsEl) starsEl.textContent = totalStars;
+    if (forksEl) forksEl.textContent = totalForks;
+    if (langsEl) langsEl.textContent = `${langs.size || 10}+`;
+
+    const modal = document.getElementById("statsModal");
+    if (modal) modal.classList.add("active");
+}
+
+function closeStatsModal() {
+    const modal = document.getElementById("statsModal");
+    if (modal) modal.classList.remove("active");
+}
+
+function updateStatsTheme() {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const theme = isDark ? "radical" : "default";
+
+    const statsImg = document.getElementById("githubStatsImg");
+    const streakImg = document.getElementById("githubStreakImg");
+    const langsImg = document.getElementById("githubLangsImg");
+
+    if (statsImg) statsImg.src = `https://github-readme-stats.vercel.app/api?username=Subhadip24&show_icons=true&theme=${theme}&hide_border=false`;
+    if (streakImg) streakImg.src = `https://nirzak-streak-stats.vercel.app/?user=Subhadip24&theme=${theme}&hide_border=false`;
+    if (langsImg) langsImg.src = `https://github-readme-stats.vercel.app/api/top-langs/?username=Subhadip24&layout=compact&theme=${theme}&hide_border=false`;
 }
 
 // --------------------------------------------------------------------------

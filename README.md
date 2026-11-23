@@ -54,6 +54,19 @@ Experience DevSearch directly on GitHub Pages with zero setup:
 * Rolling ocean waves, foaming crests, and dynamic branching lightning flashes.
 * **Dark & Light Mode**: Smooth transition between Midnight Abyssal Storm and Daylight Coastal Tempest with frosted-glass UI.
 
+### 📜 6. Dynamic CV on the Sailing Ship
+* **Real-Time Ship Pinning**: A golden parchment CV badge is tethered to the mainmast of the 3-masted ship, floating, bobbing, and tracking the ship's coordinate trajectory in real-time across the tornado canvas.
+* **Interactive CV Modal**: Click the moving ship or its badge to view Subhadip Mondal's full developer CV—education (Techno India University), COMSYS Hackathon 7 Championship (Rank #1, Team Vic-Trio), technical skills, contact info, and custom PDF upload/print support.
+
+### 📊 7. GitHub Live Stats & Activity Insights
+* Direct header access to personal GitHub analytics via **"📊 Stats"**.
+* Dynamic theme-synced cards (Radical Dark / GitHub Light) showcasing total stars, commits, PRs, issues, current streaks, and language breakdown.
+
+### 🛡️ 8. Zero-History Private Web Search
+* **Private Web Mode**: Instant DuckDuckGo search integration that never saves search terms or browsing logs.
+* **Google History Suppression**: Query execution passes `pws=0` (disables Google web history personalization) with `rel="noopener noreferrer"`.
+* **Form Cache Shield**: Inputs configured with `autocomplete="new-password"`, `spellcheck="false"`, and `data-lpignore="true"` to prevent local browser caching of search queries.
+
 ---
 
 ## 🚀 Running Locally

@@ -1232,6 +1232,359 @@ body {
     color: #ffffff;
 }
 
+/* Floating Interactive Ship CV Badge */
+.ship-cv-badge {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    pointer-events: auto;
+    cursor: pointer;
+    will-change: transform;
+    transform: translate3d(-999px, -999px, 0);
+    user-select: none;
+    transition: transform 0.04s linear;
+}
+
+.ship-cv-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    background: rgba(28, 20, 10, 0.9);
+    border: 1.5px solid #fbbc05;
+    border-radius: 20px;
+    box-shadow: 0 4px 18px rgba(251, 188, 5, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffd54f;
+    font-size: 12px;
+    font-weight: 600;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+}
+
+[data-theme="light"] .ship-cv-inner {
+    background: rgba(255, 250, 235, 0.94);
+    color: #925800;
+    border-color: #fbbc05;
+    box-shadow: 0 4px 14px rgba(251, 188, 5, 0.35);
+}
+
+.ship-cv-inner:hover {
+    transform: translate(-50%, -50%) scale(1.12);
+    box-shadow: 0 6px 26px rgba(251, 188, 5, 0.7);
+}
+
+.ship-cv-icon {
+    font-size: 16px;
+    animation: gentleWobble 2s ease-in-out infinite;
+}
+
+.ship-cv-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.ship-cv-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ship-cv-sub {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.ship-cv-pulse {
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    border-radius: 24px;
+    border: 1.5px solid #fbbc05;
+    opacity: 0.6;
+    animation: badgePulse 2.2s infinite ease-out;
+    pointer-events: none;
+}
+
+@keyframes badgePulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.35); opacity: 0; }
+}
+
+@keyframes gentleWobble {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+}
+
+/* Search Privacy Notice */
+.search-privacy-hint {
+    margin-top: 8px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Badge Gold */
+.badge-gold {
+    background-color: rgba(251, 188, 5, 0.15);
+    color: #fbbc05;
+    border: 1px solid rgba(251, 188, 5, 0.35);
+}
+
+/* CV Modal Styling */
+.cv-modal-content {
+    max-width: 920px;
+}
+
+.cv-sheet {
+    padding: 10px 4px;
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+.cv-header-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.cv-candidate-name {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.cv-candidate-role {
+    font-size: 14.5px;
+    color: var(--google-blue);
+    font-weight: 500;
+}
+
+.cv-institution {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.cv-contact-pills {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cv-contact-chip {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.cv-contact-chip:hover {
+    color: var(--google-blue);
+    text-decoration: underline;
+}
+
+.cv-highlight-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(251, 188, 5, 0.08);
+    border: 1px solid rgba(251, 188, 5, 0.3);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+}
+
+.cv-highlight-icon {
+    font-size: 26px;
+}
+
+.cv-highlight-text h4 {
+    font-size: 14.5px;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+}
+
+.cv-highlight-text p {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--google-blue);
+    margin-bottom: 4px;
+}
+
+.cv-highlight-text small {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    display: block;
+}
+
+.cv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.cv-section {
+    margin-bottom: 20px;
+}
+
+.cv-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid var(--border-color);
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.cv-subgroup {
+    margin-bottom: 12px;
+}
+
+.cv-sub-title {
+    display: block;
+    font-size: 12.5px;
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+}
+
+.cv-badges-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.skill-pill {
+    background: var(--btn-secondary-bg);
+    border: 1px solid var(--border-color);
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.cv-item {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.cv-item:last-child {
+    border-bottom: none;
+}
+
+.cv-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+}
+
+.cv-item-header strong {
+    font-size: 13.5px;
+}
+
+.cv-date {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.cv-link {
+    font-size: 11.5px;
+    color: var(--google-blue);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.cv-link:hover {
+    text-decoration: underline;
+}
+
+.cv-item-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.cv-desc {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-top: 3px;
+}
+
+/* GitHub Stats Modal */
+.stats-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-metric-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+}
+
+.stat-metric-val {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--google-blue);
+}
+
+.stat-metric-lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.stats-cards-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.stats-card-container {
+    flex: 1;
+    min-width: 280px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+.stats-card-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.github-stats-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .google-brand {
@@ -1255,6 +1608,15 @@ body {
         height: 200px;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
+    }
+    .cv-grid {
+        grid-template-columns: 1fr;
+    }
+    .stats-metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .stats-cards-row {
+        flex-direction: column;
     }
 }
 

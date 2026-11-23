@@ -486,6 +486,46 @@
                 ctx.closePath();
                 ctx.fillStyle = '#ea4335'; // Signature Google Red flag
                 ctx.fill();
+
+                // Fluttering CV Parchment Banner attached to mainmast
+                const cvY = -mast.h - 22;
+                const cvWave = Math.sin(time * 7) * 3;
+
+                // Tether lines connecting to mainmast
+                ctx.strokeStyle = isDark ? 'rgba(255, 215, 0, 0.65)' : 'rgba(180, 120, 20, 0.65)';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(mast.x, -mast.h);
+                ctx.lineTo(mast.x - 18, cvY + 8 + cvWave * 0.5);
+                ctx.moveTo(mast.x, -mast.h);
+                ctx.lineTo(mast.x + 18, cvY + 8 + cvWave * 0.5);
+                ctx.stroke();
+
+                // Glowing parchment scroll
+                ctx.save();
+                ctx.translate(mast.x, cvY + cvWave);
+                ctx.rotate(Math.sin(time * 4.5) * 0.08);
+
+                ctx.shadowColor = '#fbbc05';
+                ctx.shadowBlur = isDark ? 16 : 8;
+
+                // Parchment body
+                ctx.fillStyle = isDark ? 'rgba(35, 25, 12, 0.95)' : 'rgba(255, 248, 230, 0.95)';
+                ctx.strokeStyle = '#fbbc05';
+                ctx.lineWidth = 1.6;
+                ctx.beginPath();
+                ctx.roundRect(-30, -12, 60, 24, 6);
+                ctx.fill();
+                ctx.stroke();
+
+                // CV Banner text
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = isDark ? '#ffd54f' : '#8d5b00';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('📜 CV', 0, 1);
+                ctx.restore();
             }
         }
 
@@ -636,6 +676,14 @@
         updateShip(time);
         drawShipWakes();
         drawShip(time);
+
+        // Update floating interactive CV badge position to track the ship
+        const cvBadge = document.getElementById('shipCvBadge');
+        if (cvBadge) {
+            const badgeX = ship.x;
+            const badgeY = ship.y - (100 * ship.scale);
+            cvBadge.style.transform = `translate3d(${badgeX}px, ${badgeY}px, 0)`;
+        }
 
         // 4. Draw turbulent ocean waves (layering over lower ship hull)
         drawWaves(time);

@@ -13,6 +13,18 @@
     <!-- Animated Storm & Ship Canvas Background -->
     <canvas id="stormCanvas" class="storm-background-canvas"></canvas>
 
+    <!-- Floating Interactive CV Badge Attached to the Moving Ship -->
+    <div id="shipCvBadge" class="ship-cv-badge" onclick="openCvModal()" title="Click to view Subhadip's CV & Resume">
+        <div class="ship-cv-inner">
+            <span class="ship-cv-icon">📜</span>
+            <div class="ship-cv-text">
+                <span class="ship-cv-name">Subhadip's CV</span>
+                <span class="ship-cv-sub">Click to Open ↗</span>
+            </div>
+            <span class="ship-cv-pulse"></span>
+        </div>
+    </div>
+
     <!-- Header Navigation -->
     <header class="app-header">
         <div class="header-left">
@@ -40,6 +52,12 @@
                 <span>Upload Project</span>
             </button>
 
+            <!-- GitHub Stats Button -->
+            <button id="openStatsBtn" class="btn btn-outline" title="View GitHub Stats & Analytics">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                <span>GitHub Stats</span>
+            </button>
+
             <!-- GitHub Account / Settings -->
             <button id="openSettingsBtn" class="btn btn-outline" title="Connect GitHub Account">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -64,11 +82,15 @@
             <div class="search-modes" id="searchModes">
                 <button class="mode-tab active" data-mode="github">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                    My GitHub Projects
+                    My Projects
                 </button>
-                <button class="mode-tab" data-mode="web">
+                <button class="mode-tab" data-mode="private_web" title="Private search with ZERO search history logged or saved to Google">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    🔒 Private Search (No History)
+                </button>
+                <button class="mode-tab" data-mode="web" title="Google Search with personalization & history disabled">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                    Google Web Search
+                    Google Web (No Track)
                 </button>
                 <button class="mode-tab" data-mode="gh_all">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -76,14 +98,27 @@
                 </button>
             </div>
 
-            <!-- Google-Style Search Box -->
+            <!-- Google-Style Search Box (History-Protected) -->
             <div class="search-box-container">
                 <div class="search-box">
                     <div class="search-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </div>
-                    <input type="text" id="searchInput" placeholder="Search your repositories, languages, or projects..." autocomplete="off" autofocus>
+                    <input type="text" id="searchInput" 
+                           placeholder="Search your repositories, languages, or projects..." 
+                           autocomplete="off" 
+                           autocomplete="new-password"
+                           autocorrect="off" 
+                           autocapitalize="off" 
+                           spellcheck="false"
+                           data-lpignore="true"
+                           data-form-type="other"
+                           name="devsearch_no_history"
+                           autofocus>
                     <button id="clearSearchBtn" class="clear-btn" style="display: none;" title="Clear search">✕</button>
+                </div>
+                <div class="search-privacy-hint" id="searchPrivacyHint">
+                    <span>🔒 Privacy Active: Search history is never saved or tracked to your Google account</span>
                 </div>
             </div>
 
@@ -339,6 +374,213 @@
                             <div style="font-size: 32px; margin-bottom: 8px;">💻</div>
                             <p>Select any code or documentation file on the left to preview it directly in your browser.</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Subhadip's Interactive CV / Resume -->
+    <div id="cvModal" class="modal-overlay">
+        <div class="modal-content modal-xl cv-modal-content">
+            <div class="modal-header">
+                <div class="cv-title-group">
+                    <span class="badge badge-primary">📜 Curriculum Vitae</span>
+                    <h3>Subhadip Mondal</h3>
+                    <span class="badge badge-gold">🏅 Hackathon Champion</span>
+                </div>
+                <div class="modal-header-actions">
+                    <button class="btn btn-sm btn-outline" onclick="window.print()" title="Print or Save CV as PDF">🖨️ Print / PDF</button>
+                    <label class="btn btn-sm btn-secondary" title="Upload custom PDF to view inside DevSearch" style="cursor: pointer; margin: 0;">
+                        📂 Upload PDF
+                        <input type="file" id="cvPdfUpload" accept=".pdf" style="display: none;" onchange="handleCvPdfUpload(this)">
+                    </label>
+                    <button class="modal-close" onclick="closeCvModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body cv-modal-body" id="cvModalBody">
+                <!-- Custom PDF Viewer Area if uploaded -->
+                <div id="customPdfContainer" style="display: none; height: 65vh;">
+                    <iframe id="customPdfFrame" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
+                    <div style="text-align: right; margin-top: 8px;">
+                        <button class="btn btn-sm btn-outline" onclick="resetToNativeCv()">Show Standard CV View</button>
+                    </div>
+                </div>
+
+                <!-- Native Rich CV Document -->
+                <div id="nativeCvDocument" class="cv-sheet">
+                    <!-- CV Header Profile -->
+                    <div class="cv-header-block">
+                        <div class="cv-header-left">
+                            <h1 class="cv-candidate-name">Subhadip Mondal</h1>
+                            <p class="cv-candidate-role">Computer Science & Engineering Student • AI/ML Developer</p>
+                            <p class="cv-institution">🎓 Techno India University, India 🇮🇳</p>
+                        </div>
+                        <div class="cv-contact-pills">
+                            <a href="mailto:subhadipmondal783@gmail.com" class="cv-contact-chip">✉️ subhadipmondal783@gmail.com</a>
+                            <a href="https://linkedin.com/in/subhadipmondal24" target="_blank" rel="noopener" class="cv-contact-chip">🔗 linkedin.com/in/subhadipmondal24</a>
+                            <a href="https://github.com/Subhadip24" target="_blank" rel="noopener" class="cv-contact-chip">🐙 github.com/Subhadip24</a>
+                            <a href="https://instagram.com/_subhadip_mondal_24" target="_blank" rel="noopener" class="cv-contact-chip">📸 @_subhadip_mondal_24</a>
+                        </div>
+                    </div>
+
+                    <!-- Highlight: Hackathon International Champion -->
+                    <div class="cv-highlight-card">
+                        <div class="cv-highlight-icon">🏆</div>
+                        <div class="cv-highlight-text">
+                            <h4>International Champion — COMSYS Hackathon 7 (Rank #1)</h4>
+                            <p>Team Vic-Trio (Subhadip, Sourodyuti, Akshar) • Score: 0.755 (Rank #1 Winner)</p>
+                            <small>Announced live at the 7th International Conference on Frontiers in Computing and Systems (COMSYS 2026), jointly organized by Škoda Auto University, Czech Republic & COMSYS Educational Trust. Authored a Novel Lazy Learning Methodology.</small>
+                        </div>
+                    </div>
+
+                    <!-- Two-column CV layout -->
+                    <div class="cv-grid">
+                        <div class="cv-col">
+                            <!-- Technical Skills -->
+                            <div class="cv-section">
+                                <h3 class="cv-section-title">💻 Technical Skills & Stack</h3>
+                                <div class="cv-subgroup">
+                                    <strong class="cv-sub-title">Languages:</strong>
+                                    <div class="cv-badges-wrap">
+                                        <span class="skill-pill">Python</span>
+                                        <span class="skill-pill">C</span>
+                                        <span class="skill-pill">C++</span>
+                                        <span class="skill-pill">JavaScript</span>
+                                        <span class="skill-pill">HTML5</span>
+                                        <span class="skill-pill">CSS3</span>
+                                        <span class="skill-pill">Bash</span>
+                                        <span class="skill-pill">PowerShell</span>
+                                    </div>
+                                </div>
+                                <div class="cv-subgroup">
+                                    <strong class="cv-sub-title">AI, ML & Data Science:</strong>
+                                    <div class="cv-badges-wrap">
+                                        <span class="skill-pill">PyTorch</span>
+                                        <span class="skill-pill">TensorFlow</span>
+                                        <span class="skill-pill">NumPy</span>
+                                        <span class="skill-pill">Pandas</span>
+                                        <span class="skill-pill">Scikit-learn</span>
+                                        <span class="skill-pill">Anaconda</span>
+                                    </div>
+                                </div>
+                                <div class="cv-subgroup">
+                                    <strong class="cv-sub-title">Cloud & Databases:</strong>
+                                    <div class="cv-badges-wrap">
+                                        <span class="skill-pill">AWS</span>
+                                        <span class="skill-pill">Google Cloud</span>
+                                        <span class="skill-pill">Cloudflare</span>
+                                        <span class="skill-pill">MySQL</span>
+                                        <span class="skill-pill">MongoDB</span>
+                                        <span class="skill-pill">Nginx</span>
+                                        <span class="skill-pill">Apache</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Education -->
+                            <div class="cv-section">
+                                <h3 class="cv-section-title">🎓 Education</h3>
+                                <div class="cv-item">
+                                    <div class="cv-item-header">
+                                        <strong>B.Tech in Computer Science & Engineering</strong>
+                                        <span class="cv-date">Current</span>
+                                    </div>
+                                    <div class="cv-item-sub">Techno India University, West Bengal, India</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cv-col">
+                            <!-- Key Projects -->
+                            <div class="cv-section">
+                                <h3 class="cv-section-title">🚀 Featured Projects</h3>
+                                <div class="cv-item">
+                                    <div class="cv-item-header">
+                                        <strong>DevSearch — Personal Google & Hub</strong>
+                                        <a href="https://github.com/Subhadip24/DevSearch" target="_blank" class="cv-link">GitHub ↗</a>
+                                    </div>
+                                    <p class="cv-desc">Personalized developer search hub with 60 FPS Canvas tornado & ship physics, real-time GitHub sync, in-browser code explorer, and zero-history private search.</p>
+                                </div>
+                                <div class="cv-item">
+                                    <div class="cv-item-header">
+                                        <strong>VANI — Voice Assistant</strong>
+                                        <span class="cv-date">In Progress</span>
+                                    </div>
+                                    <p class="cv-desc">Custom AI-driven voice assistant designed for task automation and intelligent conversational queries.</p>
+                                </div>
+                                <div class="cv-item">
+                                    <div class="cv-item-header">
+                                        <strong>Heart Disease Classification (AIml-Project)</strong>
+                                        <a href="https://github.com/Subhadip24/AIml-Project" target="_blank" class="cv-link">GitHub ↗</a>
+                                    </div>
+                                    <p class="cv-desc">Machine Learning model utilizing K-Nearest Neighbors (KNN) algorithms to accurately classify clinical cardiac patient data.</p>
+                                </div>
+                                <div class="cv-item">
+                                    <div class="cv-item-header">
+                                        <strong>Smart India Hackathon (Sih2026) & KnowVia</strong>
+                                        <a href="https://github.com/Subhadip24/Sih2026" target="_blank" class="cv-link">GitHub ↗</a>
+                                    </div>
+                                    <p class="cv-desc">Collaborative solutions engineered for real-world governance, knowledge discovery, and edge computing.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: GitHub Stats, Analytics & Streaks -->
+    <div id="statsModal" class="modal-overlay">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <div class="stats-modal-title">
+                    <span class="badge badge-primary">📊 GitHub Analytics</span>
+                    <h3>@Subhadip24 GitHub Stats & Streaks</h3>
+                </div>
+                <div class="modal-header-actions">
+                    <a href="https://github.com/Subhadip24" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Open GitHub Profile ↗</a>
+                    <button class="modal-close" onclick="closeStatsModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body stats-modal-body">
+                <!-- Summary Metrics Ribbon -->
+                <div class="stats-metrics-grid">
+                    <div class="stat-metric-card">
+                        <span class="stat-metric-val" id="statsModalRepos">20</span>
+                        <span class="stat-metric-lbl">Total Repositories</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <span class="stat-metric-val" id="statsModalStars">0</span>
+                        <span class="stat-metric-lbl">Stars Earned</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <span class="stat-metric-val" id="statsModalForks">0</span>
+                        <span class="stat-metric-lbl">Total Forks</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <span class="stat-metric-val" id="statsModalLangs">10+</span>
+                        <span class="stat-metric-lbl">Languages Used</span>
+                    </div>
+                </div>
+
+                <!-- GitHub Readme Stats Live Cards (Theme-aware) -->
+                <div class="stats-cards-row">
+                    <div class="stats-card-container">
+                        <h4 class="stats-card-title">Overall GitHub Activity</h4>
+                        <img id="githubStatsImg" class="github-stats-img" src="https://github-readme-stats.vercel.app/api?username=Subhadip24&show_icons=true&theme=radical&hide_border=false" alt="Subhadip24 GitHub Stats" loading="lazy">
+                    </div>
+                    <div class="stats-card-container">
+                        <h4 class="stats-card-title">Contribution Streak</h4>
+                        <img id="githubStreakImg" class="github-stats-img" src="https://nirzak-streak-stats.vercel.app/?user=Subhadip24&theme=radical&hide_border=false" alt="Subhadip24 Streak Stats" loading="lazy">
+                    </div>
+                </div>
+
+                <div class="stats-cards-row" style="margin-top: 18px;">
+                    <div class="stats-card-container" style="flex: 1;">
+                        <h4 class="stats-card-title">Top Languages Distribution</h4>
+                        <img id="githubLangsImg" class="github-stats-img" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Subhadip24&layout=compact&theme=radical&hide_border=false" alt="Subhadip24 Top Languages" loading="lazy">
                     </div>
                 </div>
             </div>
