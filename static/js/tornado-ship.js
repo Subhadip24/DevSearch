@@ -25,6 +25,13 @@
     // Vortex parameters
     let vortexCenter = { x: 0, y: 0 };
     let vortexRotation = 0;
+    let cycloneRotation = 0;
+
+    // Torrential Rain & Cyclone Storm System
+    const NUM_RAINDROPS = 480;
+    const rainDrops = [];
+    const splashRipples = [];
+    const NUM_SPLASHES_MAX = 90;
 
     // Ship State & Physics
     const ship = {
@@ -58,8 +65,9 @@
         handleResize();
         window.addEventListener('resize', handleResize, { passive: true });
 
-        // Initialize particles
+        // Initialize particles & heavy rainfall system
         initParticles();
+        initRain();
 
         // Watch for theme changes (Dark / Light)
         const observer = new MutationObserver(() => {
@@ -664,18 +672,24 @@
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, width, height);
 
-        // 1. Draw swirling tornado vortex
+        // 1. Draw rotating cyclone spiral cloud bands
+        drawCycloneSpiral(time);
+
+        // 2. Draw swirling tornado vortex
         updateParticles();
         drawTornado();
 
-        // 2. Draw lightning
+        // 3. Draw lightning
         updateLightning();
         drawLightning();
 
-        // 3. Update & Draw moving ship and wakes
+        // 4. Update & Draw moving ship and wakes
         updateShip(time);
         drawShipWakes();
         drawShip(time);
+
+        // 5. Draw heavy torrential rainfall
+        updateAndDrawRain(time);
 
         // Update floating interactive CV badge position to track the ship
         const cvBadge = document.getElementById('shipCvBadge');
@@ -685,9 +699,181 @@
             cvBadge.style.transform = `translate3d(${badgeX}px, ${badgeY}px, 0)`;
         }
 
-        // 4. Draw turbulent ocean waves (layering over lower ship hull)
+        // 6. Draw turbulent ocean waves (layering over lower ship hull) & rain ripples
         drawWaves(time);
+        drawSplashes();
     }
+
+    // ----------------------------------------------------------------------
+    // Heavy Rainfall & Cyclone Spiral Cloud Systems
+    // ----------------------------------------------------------------------
+    function initRain() {
+        rainDrops.length = 0;
+        splashRipples.length = 0;
+        for (let i = 0; i < NUM_RAINDROPS; i++) {
+            rainDrops.push({
+                x: Math.random() * (width + 600) - 300,
+                y: Math.random() * height,
+                length: Math.random() * 32 + 22,
+                speed: Math.random() * 12 + 24,
+                slant: -(Math.random() * 5 + 11), // High horizontal wind shear into cyclone
+                alpha: Math.random() * 0.45 + 0.25,
+                thickness: Math.random() * 1.5 + 0.75
+            });
+        }
+    }
+
+    function drawCycloneSpiral(time) {
+        cycloneRotation += 0.008;
+        const cx = vortexCenter.x;
+        const cy = vortexCenter.y;
+        const maxRadius = Math.max(width, height) * 0.75;
+
+        ctx.save();
+
+        // 1. Overcast storm atmosphere at top of sky
+        const overcastGrad = ctx.createLinearGradient(0, 0, 0, height * 0.55);
+        if (isDark) {
+            overcastGrad.addColorStop(0, 'rgba(4, 7, 14, 0.75)');
+            overcastGrad.addColorStop(0.5, 'rgba(12, 18, 30, 0.55)');
+            overcastGrad.addColorStop(1, 'rgba(10, 16, 28, 0)');
+        } else {
+            overcastGrad.addColorStop(0, 'rgba(100, 125, 150, 0.55)');
+            overcastGrad.addColorStop(0.5, 'rgba(130, 155, 180, 0.35)');
+            overcastGrad.addColorStop(1, 'rgba(160, 185, 210, 0)');
+        }
+        ctx.fillStyle = overcastGrad;
+        ctx.fillRect(0, 0, width, height * 0.55);
+
+        // 2. Cyclone Rotating Spiral Cloud Bands (4 logarithmic spiral arms)
+        const arms = 4;
+        for (let arm = 0; arm < arms; arm++) {
+            const armBaseAngle = cycloneRotation + (arm * (Math.PI * 2 / arms));
+            
+            ctx.beginPath();
+            for (let t = 0.08; t <= 1; t += 0.04) {
+                const r = Math.pow(t, 0.82) * maxRadius;
+                const angle = armBaseAngle + t * 4.2;
+                const px = cx + Math.cos(angle) * r;
+                const py = cy + Math.sin(angle) * (r * 0.42); // perspective flattening
+                
+                if (t === 0.08) {
+                    ctx.moveTo(px, py);
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+
+            // Arm stroke thickness & dynamic lightning flash response
+            ctx.strokeStyle = isDark 
+                ? `rgba(28, 44, 72, ${0.16 + (lightningIntensity * 0.2)})` 
+                : `rgba(135, 165, 195, ${0.18 + (lightningIntensity * 0.15)})`;
+            ctx.lineWidth = 38 * (1 + lightningIntensity * 0.3);
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // Inner tighter spiral filament
+            ctx.lineWidth = 16;
+            ctx.strokeStyle = isDark 
+                ? `rgba(45, 68, 105, ${0.14 + (lightningIntensity * 0.25)})` 
+                : `rgba(175, 200, 225, ${0.15 + (lightningIntensity * 0.2)})`;
+            ctx.stroke();
+        }
+
+        // 3. Cyclone Eye / Core Pressure Ring
+        const eyeGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, width * 0.22);
+        if (isDark) {
+            eyeGrad.addColorStop(0, 'rgba(6, 10, 20, 0.6)');
+            eyeGrad.addColorStop(0.4, 'rgba(18, 30, 52, 0.35)');
+            eyeGrad.addColorStop(1, 'rgba(10, 16, 28, 0)');
+        } else {
+            eyeGrad.addColorStop(0, 'rgba(120, 150, 180, 0.45)');
+            eyeGrad.addColorStop(0.4, 'rgba(145, 175, 205, 0.25)');
+            eyeGrad.addColorStop(1, 'rgba(170, 200, 225, 0)');
+        }
+        ctx.fillStyle = eyeGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, width * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function updateAndDrawRain(time) {
+        ctx.save();
+        const waveBase = height * 0.76;
+
+        for (let i = 0; i < rainDrops.length; i++) {
+            const drop = rainDrops[i];
+            drop.x += drop.slant;
+            drop.y += drop.speed;
+
+            // Approximate wave height at drop x position
+            const waveY = waveBase + Math.sin(drop.x * 0.009 + time * 1.8) * 16;
+
+            // When drop hits ocean wave or falls below screen
+            if (drop.y >= waveY || drop.y > height) {
+                if (drop.x >= 0 && drop.x <= width && splashRipples.length < NUM_SPLASHES_MAX && Math.random() < 0.35) {
+                    splashRipples.push({
+                        x: drop.x,
+                        y: waveY,
+                        radius: 1,
+                        maxRadius: Math.random() * 7 + 4,
+                        alpha: 0.75,
+                        growth: 0.65 + Math.random() * 0.4
+                    });
+                }
+
+                // Reset drop to top with wind offset
+                drop.y = -Math.random() * 60 - drop.length;
+                drop.x = Math.random() * (width + 600) - 200;
+            }
+
+            // Draw rain streak
+            const litAlpha = Math.min(1.0, drop.alpha + (lightningIntensity * 0.6));
+            ctx.strokeStyle = isDark 
+                ? `rgba(165, 218, 255, ${litAlpha})` 
+                : `rgba(95, 145, 195, ${litAlpha})`;
+            ctx.lineWidth = drop.thickness;
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x - drop.slant * 0.6, drop.y - drop.length);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    function drawSplashes() {
+        if (splashRipples.length === 0) return;
+        ctx.save();
+
+        for (let i = splashRipples.length - 1; i >= 0; i--) {
+            const s = splashRipples[i];
+            s.radius += s.growth;
+            s.alpha -= 0.045;
+
+            if (s.alpha <= 0 || s.radius >= s.maxRadius) {
+                splashRipples.splice(i, 1);
+                continue;
+            }
+
+            ctx.beginPath();
+            ctx.ellipse(s.x, s.y, s.radius * 2.2, s.radius * 0.7, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = isDark 
+                ? `rgba(180, 230, 255, ${s.alpha * 0.65})` 
+                : `rgba(255, 255, 255, ${s.alpha * 0.85})`;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    // Export trigger lightning for Voice Agent
+    window.triggerStormLightning = triggerLightning;
 
     // Start on DOM ready
     if (document.readyState === 'loading') {

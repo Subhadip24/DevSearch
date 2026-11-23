@@ -115,6 +115,7 @@
                            data-form-type="other"
                            name="devsearch_no_history"
                            autofocus>
+                    <button id="voiceSearchMicBtn" class="voice-search-mic-btn" type="button" title="Speak to DevSearch AI Voice Agent (Ctrl+M)">🎙️</button>
                     <button id="clearSearchBtn" class="clear-btn" style="display: none;" title="Clear search">✕</button>
                 </div>
                 <div class="search-privacy-hint" id="searchPrivacyHint">
@@ -590,8 +591,120 @@
     <!-- Toast Notification for Copied Clone URL -->
     <div id="toast" class="toast">Command copied to clipboard!</div>
 
+    <!-- AI Voice Agent Floating Dock & Live HUD -->
+    <button id="voiceAgentDockBtn" class="voice-agent-dock-btn" type="button" title="DevSearch Autonomous Voice Copilot (Ctrl+M)">
+        <span>🎙️</span>
+    </button>
+
+    <div id="voiceAgentHud" class="voice-agent-hud">
+        <div class="voice-hud-header">
+            <div class="voice-hud-title">
+                <span class="voice-hud-dot"></span>
+                <span>DevSearch Voice Copilot</span>
+            </div>
+            <div class="voice-hud-actions">
+                <button id="voiceMuteBtn" class="voice-hud-btn" title="Toggle Voice Audio Feedback">🔊</button>
+                <button id="voiceHelpBtn" class="voice-hud-btn" title="View Spoken Commands">❓</button>
+                <button id="voiceHudCloseBtn" class="voice-hud-btn" title="Close HUD">✕</button>
+            </div>
+        </div>
+
+        <!-- Audio Visualizer Waveform -->
+        <div class="voice-visualizer" id="voiceVisualizer">
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+        </div>
+
+        <!-- Live Dialog & Transcripts -->
+        <div class="voice-dialog-body">
+            <div class="voice-user-transcript" id="voiceTranscriptText">🗣️ Say a command or query...</div>
+            <div class="voice-agent-reply" id="voiceReplyText">🤖 DevSearch Copilot ready. Speak naturally or press Ctrl+M.</div>
+            <div class="voice-status-bar" id="voiceStatusText">Listening... Speak any command</div>
+        </div>
+
+        <!-- Voice Quick Action Pills -->
+        <div class="voice-quick-pills">
+            <button class="voice-pill" onclick="DevSearchVoice.speak('Opening Subhadip\'s CV'); openCvModal();">📜 Open CV</button>
+            <button class="voice-pill" onclick="DevSearchVoice.speak('Opening live GitHub stats'); openStatsModal();">📊 GitHub Stats</button>
+            <button class="voice-pill" onclick="toggleTheme();">🌓 Dark/Light Mode</button>
+            <button class="voice-pill" onclick="handleLuckySearch();">⚡ Lucky Project</button>
+            <button class="voice-pill" onclick="selectSearchMode('private_web');">🔒 Private Search</button>
+            <button class="voice-pill" onclick="if (window.triggerStormLightning) { window.triggerStormLightning(); DevSearchVoice.speak('Summoning lightning strike!'); }">🌩️ Lightning</button>
+        </div>
+    </div>
+
+    <!-- Voice Commands Cheatsheet Modal -->
+    <div id="voiceCommandsModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 680px;">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    <h3>DevSearch Autonomous Voice Commands</h3>
+                </div>
+                <button class="modal-close" onclick="DevSearchVoice.closeHelp()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 16px 20px;">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+                    Speak any of the following natural commands or press <kbd style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-weight: bold;">Ctrl + M</kbd> to toggle voice listening anytime.
+                </p>
+                <div class="commands-grid">
+                    <div class="command-category-card">
+                        <div class="command-category-title">🔍 Search & Discovery</div>
+                        <ul class="command-list">
+                            <li class="command-item"><kbd>"Search for [query]"</kbd> <span>Search personal repos</span></li>
+                            <li class="command-item"><kbd>"Private search [query]"</kbd> <span>Zero-history web search</span></li>
+                            <li class="command-item"><kbd>"Google [query]"</kbd> <span>Clean web search without track</span></li>
+                            <li class="command-item"><kbd>"Global search [query]"</kbd> <span>Search all of GitHub</span></li>
+                            <li class="command-item"><kbd>"I'm feeling lucky"</kbd> <span>Open random project</span></li>
+                            <li class="command-item"><kbd>"Clear search"</kbd> <span>Restore all repositories</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="command-category-card">
+                        <div class="command-category-title">⚡ Direct Code & Web IDE</div>
+                        <ul class="command-list">
+                            <li class="command-item"><kbd>"Open project [name]"</kbd> <span>In-browser code explorer</span></li>
+                            <li class="command-item"><kbd>"Web IDE for [name]"</kbd> <span>Launch Web VS Code</span></li>
+                            <li class="command-item"><kbd>"Readme for [name]"</kbd> <span>Read project documentation</span></li>
+                            <li class="command-item"><kbd>"Clone [name]"</kbd> <span>Copy git clone command</span></li>
+                            <li class="command-item"><kbd>"Filter by Python/Java"</kbd> <span>Filter by language</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="command-category-card">
+                        <div class="command-category-title">📜 Portfolio & Modals</div>
+                        <ul class="command-list">
+                            <li class="command-item"><kbd>"Open my CV"</kbd> <span>View Subhadip's full CV</span></li>
+                            <li class="command-item"><kbd>"Print CV"</kbd> <span>Save CV as PDF</span></li>
+                            <li class="command-item"><kbd>"Show GitHub stats"</kbd> <span>View streak & analytics</span></li>
+                            <li class="command-item"><kbd>"Upload project"</kbd> <span>Drag & drop code publisher</span></li>
+                            <li class="command-item"><kbd>"Open settings"</kbd> <span>Manage GitHub token</span></li>
+                            <li class="command-item"><kbd>"Sync repositories"</kbd> <span>Real-time repo update</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="command-category-card">
+                        <div class="command-category-title">🌪️ Cyclone & Atmosphere</div>
+                        <ul class="command-list">
+                            <li class="command-item"><kbd>"Dark mode"</kbd> <span>Switch to abyssal dark storm</span></li>
+                            <li class="command-item"><kbd>"Light mode"</kbd> <span>Switch to daylight tempest</span></li>
+                            <li class="command-item"><kbd>"Trigger lightning"</kbd> <span>Summon storm lightning bolt</span></li>
+                            <li class="command-item"><kbd>"Scroll down"</kbd> <span>Scroll to repositories</span></li>
+                            <li class="command-item"><kbd>"Scroll to top"</kbd> <span>Back to top header</span></li>
+                            <li class="command-item"><kbd>"Stop listening"</kbd> <span>Pause voice assistant</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="static/js/tornado-ship.js"></script>
     <script src="static/js/main.js"></script>
+    <script src="static/js/voice-agent.js"></script>
 </body>
 </html>
 

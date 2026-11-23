@@ -1298,3 +1298,68 @@ function escapeHTML(str) {
     );
 }
 
+// ==========================================================================
+// Global Window API for Voice Agent & Automations
+// ==========================================================================
+window.appState = appState;
+window.loadRepositories = loadRepositories;
+window.executeSearch = executeSearch;
+window.handleLuckySearch = handleLuckySearch;
+window.openCodeExplorer = typeof openCodeExplorer !== 'undefined' ? openCodeExplorer : null;
+window.closeCodeExplorer = typeof closeCodeExplorer !== 'undefined' ? closeCodeExplorer : null;
+window.viewReadme = typeof viewReadme !== 'undefined' ? viewReadme : null;
+window.closeReadmeModal = typeof closeReadmeModal !== 'undefined' ? closeReadmeModal : null;
+window.copyCloneCommand = typeof copyCloneCommand !== 'undefined' ? copyCloneCommand : null;
+window.openCvModal = openCvModal;
+window.closeCvModal = closeCvModal;
+window.openStatsModal = openStatsModal;
+window.closeStatsModal = closeStatsModal;
+window.openUploadModal = openUploadModal;
+window.closeUploadModal = closeUploadModal;
+window.openSettingsModal = openSettingsModal;
+window.closeSettingsModal = closeSettingsModal;
+
+window.toggleTheme = function(target) {
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    const nextTheme = target || (currentTheme === "dark" ? "light" : "dark");
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("devsearch_theme", nextTheme);
+    updateThemeIcon(nextTheme);
+    updateStatsTheme();
+    return nextTheme;
+};
+
+window.selectSearchMode = function(mode) {
+    const tab = searchModes.querySelector(`.mode-tab[data-mode="${mode}"]`);
+    if (tab) {
+        tab.click();
+    } else {
+        appState.searchMode = mode;
+        updateSearchPlaceholder();
+    }
+};
+
+window.filterByLanguage = function(lang) {
+    appState.selectedLanguage = lang;
+    const chips = languageChips.querySelectorAll(".chip");
+    let matched = false;
+    chips.forEach(c => {
+        if (c.dataset.lang && c.dataset.lang.toLowerCase() === lang.toLowerCase()) {
+            c.classList.add("active");
+            matched = true;
+        } else {
+            c.classList.remove("active");
+        }
+    });
+    filterAndRenderRepos();
+};
+
+window.setSortBy = function(val) {
+    if (sortBy) {
+        sortBy.value = val;
+        appState.sortBy = val;
+        sortRepositories();
+        renderRepositories();
+    }
+};
+

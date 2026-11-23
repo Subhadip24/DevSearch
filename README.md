@@ -48,10 +48,11 @@ Experience DevSearch directly on GitHub Pages with zero setup:
 * Enter your repo name and visibility (Public or Private).
 * DevSearch automatically initializes Git, creates the GitHub repository under your account, commits your files, and pushes to `main`.
 
-### 🌪️ 5. Animated 60 FPS Tornado & Ship Background
+### 🌪️ 5. Animated 60 FPS Tornado, Cyclone & Ship Background
 * Full-screen Canvas background featuring a 3-masted galleon navigating a storm vortex.
 * 260+ wind & debris particles spiraling along the tornado funnel.
 * Rolling ocean waves, foaming crests, and dynamic branching lightning flashes.
+* **⛈️ Heavy Torrential Rainfall & Cyclone Spiral**: 480+ high-velocity slanted raindrops shearing across the storm with water splash ripples, 4 rotating cyclone spiral cloud arms, and atmospheric overcast lighting.
 * **Dark & Light Mode**: Smooth transition between Midnight Abyssal Storm and Daylight Coastal Tempest with frosted-glass UI.
 
 ### 📜 6. Dynamic CV on the Sailing Ship
@@ -66,6 +67,15 @@ Experience DevSearch directly on GitHub Pages with zero setup:
 * **Private Web Mode**: Instant DuckDuckGo search integration that never saves search terms or browsing logs.
 * **Google History Suppression**: Query execution passes `pws=0` (disables Google web history personalization) with `rel="noopener noreferrer"`.
 * **Form Cache Shield**: Inputs configured with `autocomplete="new-password"`, `spellcheck="false"`, and `data-lpignore="true"` to prevent local browser caching of search queries.
+
+### 🎙️ 9. Autonomous AI Voice Agent & Complete Automation
+* **Continuous Hands-Free Automation**: Voice copilot powered by the Web Speech API and browser speech synthesis. Press <kbd>Ctrl + M</kbd> or click the microphone to speak.
+* **Voice-Automated Actions**:
+  * 🔍 **Search Everything**: *"Search for Java"*, *"Private search for machine learning"*, *"Google React"*, *"Global search Flutter"*, *"I'm feeling lucky"*, *"Clear search"*.
+  * ⚡ **Code & Web IDE**: *"Open project DevSearch"*, *"Web IDE for DevSearch"*, *"Readme for DevSearch"*, *"Clone DevSearch"*, *"Filter by Python"*.
+  * 📜 **Credentials & Analytics**: *"Open my CV"*, *"Print CV"*, *"Show GitHub stats"*, *"Upload project"*, *"Open settings"*, *"Sync repos"*.
+  * 🌪️ **Atmospheric Control**: *"Dark mode"*, *"Light mode"*, *"Trigger lightning"*, *"Scroll down"*, *"Scroll to top"*.
+* **Floating Voice HUD & Waveform Visualizer**: Live real-time speech transcript, audio feedback chimes via Web Audio API, quick action pills, and an interactive Voice Commands cheat sheet modal.
 
 ---
 

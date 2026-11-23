@@ -1620,3 +1620,331 @@ body {
     }
 }
 
+/* ==========================================================================
+   AI Voice Agent & Autonomous Voice Automation HUD Styles
+   ========================================================================== */
+
+/* Microphone Button in Search Box */
+.voice-search-mic-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    color: var(--text-muted);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;
+}
+
+.voice-search-mic-btn:hover {
+    color: var(--google-blue);
+    background-color: var(--btn-secondary-hover);
+    transform: scale(1.12);
+}
+
+.voice-search-mic-btn.active {
+    color: #fff;
+    background-color: var(--google-red);
+    box-shadow: 0 0 14px rgba(234, 67, 53, 0.7);
+    animation: micActivePulse 1.2s infinite ease-in-out;
+}
+
+@keyframes micActivePulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.7); }
+    50% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(234, 67, 53, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
+}
+
+/* Floating Voice Agent Dock Button */
+.voice-agent-dock-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--google-blue) 0%, #174ea6 100%);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(26, 115, 232, 0.45);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 1050;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.voice-agent-dock-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 12px 28px rgba(26, 115, 232, 0.6);
+}
+
+.voice-agent-dock-btn.listening {
+    background: linear-gradient(135deg, var(--google-red) 0%, #c5221f 100%);
+    box-shadow: 0 0 24px rgba(234, 67, 53, 0.7);
+    animation: dockListeningPulse 1.5s infinite;
+}
+
+@keyframes dockListeningPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.12); box-shadow: 0 0 28px rgba(234, 67, 53, 0.9); }
+    100% { transform: scale(1); }
+}
+
+/* Floating Voice Assistant HUD */
+.voice-agent-hud {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 350px;
+    max-width: calc(100vw - 32px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg), 0 16px 36px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    z-index: 1049;
+    padding: 16px 18px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    animation: hudSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.voice-agent-hud.active {
+    display: flex;
+}
+
+@keyframes hudSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.voice-hud-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.voice-hud-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.voice-hud-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--google-green);
+    box-shadow: 0 0 8px var(--google-green);
+}
+
+.voice-hud-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.voice-hud-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 3px 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.voice-hud-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--btn-secondary-hover);
+    border-color: var(--border-hover);
+}
+
+/* Audio Visualizer Waveform */
+.voice-visualizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 28px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 0 10px;
+}
+
+[data-theme="dark"] .voice-visualizer {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.voice-bar {
+    width: 4px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: var(--google-blue);
+    transition: height 0.1s ease;
+}
+
+.voice-visualizer.active .voice-bar {
+    animation: waveBounce 0.75s ease-in-out infinite alternate;
+}
+
+.voice-visualizer.active .voice-bar:nth-child(1) { animation-delay: 0.1s; background-color: var(--google-blue); }
+.voice-visualizer.active .voice-bar:nth-child(2) { animation-delay: 0.25s; background-color: var(--google-red); }
+.voice-visualizer.active .voice-bar:nth-child(3) { animation-delay: 0.0s; background-color: var(--google-yellow); }
+.voice-visualizer.active .voice-bar:nth-child(4) { animation-delay: 0.35s; background-color: var(--google-green); }
+.voice-visualizer.active .voice-bar:nth-child(5) { animation-delay: 0.18s; background-color: var(--google-blue); }
+
+@keyframes waveBounce {
+    0% { height: 4px; }
+    100% { height: 22px; }
+}
+
+/* Transcript & Dialog Boxes */
+.voice-dialog-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.voice-user-transcript {
+    font-size: 12.5px;
+    color: var(--text-primary);
+    font-weight: 500;
+    background: rgba(26, 115, 232, 0.1);
+    border: 1px solid rgba(26, 115, 232, 0.25);
+    border-radius: 10px;
+    padding: 8px 12px;
+    line-height: 1.4;
+}
+
+.voice-agent-reply {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 10px;
+    padding: 8px 12px;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .voice-agent-reply {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.voice-status-bar {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+}
+
+/* Quick Action Pills in HUD */
+.voice-quick-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
+}
+
+.voice-pill {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.voice-pill:hover {
+    background-color: var(--btn-secondary-hover);
+    color: var(--google-blue);
+    border-color: var(--google-blue);
+}
+
+/* Voice Commands Cheatsheet Modal */
+.commands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.command-category-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.command-category-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.command-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.command-item {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.35;
+}
+
+.command-item kbd {
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 11px;
+    font-family: inherit;
+    color: var(--google-blue);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .command-item kbd {
+    background: rgba(255, 255, 255, 0.1);
+}
+
